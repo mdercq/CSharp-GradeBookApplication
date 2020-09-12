@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
-
-using GradeBook.Enums;
 using System.Collections.Generic;
 using System.IO;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+using GradeBook.Enums;
 
 namespace GradeBook.GradeBooks
 {
@@ -14,10 +15,12 @@ namespace GradeBook.GradeBooks
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public GradeBookType Type { get; set; }
+        public bool IsWeighted { get; set; }
 
-        public BaseGradeBook(string name)
+        public BaseGradeBook(string name, bool isWeighted)
         {
             Name = name;
+            IsWeighted = isWeighted;
             Students = new List<Student>();
         }
 
@@ -107,18 +110,24 @@ namespace GradeBook.GradeBooks
 
         public virtual double GetGPA(char letterGrade, StudentType studentType)
         {
+            StudentType[] goodGrades = { StudentType.Honors, StudentType.DualEnrolled };
+            bool goodStudent;
+            goodStudent = goodGrades.Contains(studentType);
+            int scoreModifier = 0;
+            if (goodStudent & IsWeighted) scoreModifier = 1; 
+
             switch (letterGrade)
             {
                 case 'A':
-                    return 4;
+                    return 4 + scoreModifier;
                 case 'B':
-                    return 3;
+                    return 3 + scoreModifier;
                 case 'C':
-                    return 2;
+                    return 2 + scoreModifier;
                 case 'D':
-                    return 1;
+                    return 1 + scoreModifier;
                 case 'F':
-                    return 0;
+                    return 0 + scoreModifier;
             }
             return 0;
         }
